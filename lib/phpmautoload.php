@@ -20,7 +20,11 @@
 
 		if (strpos($class, "Phpm") === 0) {
 
-			$class = realpath(__DIR__.substr($package, 4).".php");
+			$path = substr($package, 4).".php";
+			$class = realpath(__DIR__.$path);
+			if (empty($class)) {
+				$class = realpath(__DIR__."/../src".$path);
+			}
 			require_once($class);
 			return;
 
@@ -92,16 +96,18 @@
 				}
 
 				$config = explode("=", $line);
-				if ($config[0] == "no_load") {
+				$key = trim($config[0]);
+				$value = trim($config[1]);
+				if ($key == "no_load") {
 
-					if ($config[1] == "1" || $config[1] == "true") {
+					if ($value == "1" || $value == "true") {
 						return false;
 					}
 
 				}
-				else if ($config[0] == "package_set") {
+				else if ($key == "package_set") {
 
-					if (($path = realpath(__DIR__."/../packages/".trim($config[1])."/packages")) === false) {
+					if (($path = realpath(__DIR__."/../packages/".$value."/packages")) === false) {
 						return false;
 					}
 
